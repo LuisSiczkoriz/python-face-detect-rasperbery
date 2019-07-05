@@ -1,18 +1,20 @@
-import os, shutil
-from datetime import datetime
+import socket
 
-pathRoot = os.getcwd()
-source = os.path.join( pathRoot, 'files' )
-destination = os.path.join( pathRoot, 'upload/files.zip' )
+HOST = ''
+PORT = 57000
 
-def zipAll( source, destination ):
-    base = os.path.basename( destination )
-    name = base.split('.')[0]
-    format = base.split('.')[1]
-    archive_from = os.path.dirname( source )
-    archive_to = os.path.basename( source.strip( os.sep ) )
-    print( source, destination, archive_from, archive_to )
-    shutil.make_archive( name, format, archive_from, archive_to )
-    shutil.move( '%s.%s'%( name,format ), destination )
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen(1)
 
-zipAll( source, destination )
+conn, addr = s.accept()
+arq = open('/home/backup/foo.tar.gz', 'w')
+
+while 1:
+    dados = conn.recv(1024)
+    if not dados:
+        break
+    arq.write(dados)
+
+arq.close()
+conn.close()
