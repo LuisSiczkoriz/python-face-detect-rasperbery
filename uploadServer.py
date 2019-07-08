@@ -1,20 +1,14 @@
-import socket
+#$pip install paramiko os
+import paramiko
+import os
+import sys
 
-HOST = ''
-PORT = 57000
+pathRoot = os.getcwd()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-s.listen(1)
+HOSTNAME = 'ssh.ec2-52-55-113-15.compute-1.amazonaws.com'
+USERNAME = 'ubuntu'
+KEY_FILE = os.path.join( pathRoot, 'key-semparar-server-dsa.ppk' )
 
-conn, addr = s.accept()
-arq = open('/home/backup/foo.tar.gz', 'w')
 
-while 1:
-    dados = conn.recv(1024)
-    if not dados:
-        break
-    arq.write(dados)
-
-arq.close()
-conn.close()
+system(cd /var/www/html/)
+scp -i <key_path> -r * root@<my_local_machine_public_ip:~/var/www/html/

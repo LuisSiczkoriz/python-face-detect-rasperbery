@@ -39,11 +39,10 @@ def saveFaceDetected( cap, cameraStatus ):
     counterFrames = 0
     minute, second = ( 0, 0 )
     jsonTimer = []
-    hashNameImage = generateRandomHashName()
 
-    pathFolder = generateFolderPeople( hashNameImage, generateFolderDefault() )
+    pathFolder = generateFolderPeople( generateRandomHashName(), generateFolderDefault() )
     
-    while True:
+    while counterFrames < 300:
         ret, frame = cap.read()
 
         if second > 59:
@@ -61,12 +60,8 @@ def saveFaceDetected( cap, cameraStatus ):
         faces = faceCascade.detectMultiScale( gray, 1.3, 5 )
        
         #verifica se tem faces
-        if np.any(faces) == True:
+        if not np.any(faces):
             continue
-        else:
-            cap.release()
-            cv2.destroyAllWindows()
-            return 'ok'
 
         for ( x, y, w, h ) in faces:
             #funcao para adicionar cor no rosto e olhos
@@ -84,7 +79,7 @@ def saveFaceDetected( cap, cameraStatus ):
             continue
 
         faceImage = cv2.resize( faceImage, ( 255, 255 ) )
-        fileName = hashNameImage + "_" + str( counterFrames ) + ".png"
+        fileName = 'people' + "-" + str( counterFrames ) + ".png"
         cv2.imwrite( os.path.join( pathFolder, fileName ), faceImage )
         jsonTimer.append({'datetime' : time.strftime("%Y-%m-%d %H:%M:%S"), 'minute' : minute, 'second': second })
 
@@ -136,14 +131,11 @@ def saveFileJson( objectJson, path ):
     fileJson.close()
 
 def start():
-    delay = 5
-    returnStatus = False
+    total = 0
     cameraStatus = False
     camera = cv2.VideoCapture(0)
-    returnStatus = saveFaceDetected( camera, cameraStatus )
-    print(returnStatus)
-    if( returnStatus ):
-        #time.sleep( delay )
+    total = saveFaceDetected( camera, cameraStatus )
+    if( total >= 300 ):
         start()
 
 def main():
