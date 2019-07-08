@@ -35,8 +35,9 @@ def generateFolderPeople( fileName, pathValue ):
     
     return  os.path.normpath( os.path.join( pathValue, fileName ) )
 
-def saveFaceDetected( cap, cameraStatus ):
+def saveFaceDetected( cap, cameraStatus, delayFace, waitLoop ):
     counterFrames = 0
+    counterNotFace = 0
     minute, second = ( 0, 0 )
     jsonTimer = []
     hashNameImage = generateRandomHashName()
@@ -59,53 +60,55 @@ def saveFaceDetected( cap, cameraStatus ):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale( gray, 1.3, 5 )
-       
+
         #verifica se tem faces
-        if np.any(faces) == True:
-            continue
+        print(np.any(faces))
+        print(counterNotFace)
+
+        if np.any(faces) == False:
+            counterNotFace += 1
         else:
-            cap.release()
-            cv2.destroyAllWindows()
-            return 'ok'
+            counterNotFace  = 0
+            for ( x, y, w, h ) in faces:
+                #funcao para adicionar cor no rosto e olhos
+                colorDraw( frame, gray, x, y, w, h )
 
-        for ( x, y, w, h ) in faces:
             #funcao para adicionar cor no rosto e olhos
-            colorDraw( frame, gray, x, y, w, h )
+            showCam( cameraStatus, frame )
 
-        #funcao para adicionar cor no rosto e olhos
-        showCam( cameraStatus, frame )
+            #print( x,y,w,h )
+            faceImage = frame[ y:y + h, x:x + w ]
 
-        #print( x,y,w,h )
-        faceImage = frame[ y:y + h, x:x + w ]
+            larg, alt, _ = faceImage.shape
 
-        larg, alt, _ = faceImage.shape
+            if ( larg * alt <= 20 * 20 ):
+                continue
 
-        if ( larg * alt <= 20 * 20 ):
-            continue
+            faceImage = cv2.resize( faceImage, ( 255, 255 ) )
+            fileName = hashNameImage + "_" + str( counterFrames ) + ".png"
+            cv2.imwrite( os.path.join( pathFolder, fileName ), faceImage )
+            jsonTimer.append({'datetime' : time.strftime("%Y-%m-%d %H:%M:%S"), 'minute' : minute, 'second': second })
 
-        faceImage = cv2.resize( faceImage, ( 255, 255 ) )
-        fileName = hashNameImage + "_" + str( counterFrames ) + ".png"
-        cv2.imwrite( os.path.join( pathFolder, fileName ), faceImage )
-        jsonTimer.append({'datetime' : time.strftime("%Y-%m-%d %H:%M:%S"), 'minute' : minute, 'second': second })
+            print('------' + fileName + '------')
 
-        print('------' + fileName + '------')
+            counterFrames += 1
 
-        counterFrames += 1
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:
+                cap.release()
+                cv2.destroyAllWindows()
+                break
 
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-            cap.release()
-            cv2.destroyAllWindows()
-            break
+            time.sleep( waitLoop )
 
-        ##time.sleep(3)
-    print(pathFolder)
-    print(jsonTimer)
-    #saveFileJson( jsonTimer, pathFolder )
+        if counterNotFace == delayFace:
+           # print(pathFolder)
+           # print(jsonTimer)
+            print(saveFileJson( jsonTimer, pathFolder ))
+            return True
 
     cap.release()
     cv2.destroyAllWindows()
-    return counterFrames
 
 
 def showCam( status, frame ):
@@ -130,19 +133,22 @@ def colorDraw( frame, gray, x, y, w, h ):
 
 
 def saveFileJson( objectJson, path ):
-    pathDFile = os.path.join( path, 'file.json' )
-    fileJson = open( pathDFile, 'w')
-    fileJson.write( objectJson )
-    fileJson.close()
+    pathFile = os.path.join( path, 'file.json' )
+    fileWriteJson = open( pathFile, 'w')
+    json.dump(objectJson, fileWriteJson )
+    fileWriteJson.close()
 
 def start():
-    delay = 5
+    delayFace = 5 #5x será o maximo para criar outro id
+    waitLoop = 0 #tempo que deve esperar por cada loop 3s
     returnStatus = False
     cameraStatus = False
+
     camera = cv2.VideoCapture(0)
-    returnStatus = saveFaceDetected( camera, cameraStatus )
-    print(returnStatus)
-    if( returnStatus ):
+    
+    returnStatus = saveFaceDetected( camera, cameraStatus, delayFace, waitLoop )
+
+    if( returnStatus == True ):
         #time.sleep( delay )
         start()
 
