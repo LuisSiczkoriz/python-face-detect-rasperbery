@@ -13,9 +13,17 @@ def generateFolderDefault():
     
     return os.path.normpath( os.path.join( pathRoot, folderName ) )
 
+def checkFolderNone( dirpath ):
+    dirFiles = os.listdir( dirpath )
+    for dirFile in dirFiles:
+        dirNext = not os.listdir( os.path.join( dirpath, dirFile ) )
+        if dirNext == True:
+            os.system( 'rmdir "%s"' % os.path.join( dirpath, dirFile ) )
+
+
 def zipAll( source, destination ):
     generateFolderDefault()
-    
+
     base = os.path.basename( destination )
     name = base.split('.')[0]
     format = base.split('.')[1]
@@ -25,4 +33,6 @@ def zipAll( source, destination ):
     shutil.make_archive( name, format, archive_from, archive_to )
     shutil.move( '%s.%s'%( name,format ), destination )
 
+
+checkFolderNone( source )
 zipAll( source, destination )
