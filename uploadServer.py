@@ -4,7 +4,7 @@ import sys
 
 pathRoot = os.getcwd()
 source = os.path.join( pathRoot, 'upload' )
-source = os.path.join( source, 'files.zip' )
+#source = os.path.join( source, 'files.zip' )
 dest = '/home/ubuntu/'
 
 keyRSA = os.path.join( pathRoot, 'keyAws.pem' )
@@ -21,13 +21,25 @@ try:
     client.connect( hostname = hostname, username = username, pkey = keyConnect )
 
     sftp = client.open_sftp()
-    sftp.put(source, dest)
 
-    stdin, stdout, stderr = client.exec_command('pwd')
+    try:
+        sftp.chdir( dest )
+    except IOError:
+        sftp.mkdir( dest )
+        sftp.chdir( dest )
+
+    for root, dirs, files in os.walk( source ):
+        for fname in files:
+            full_fname = os.path.join( root, fname )
+            sftp.put( full_fname, os.path.join( dest, fname ) )
+
+    sftp.put( source, os.path.join( dest, 'files.zip' ) )
+    stdin, stdout, stderr = client.exec_command('ls -a')
+    
     print(stdout.read())
+    print("connected")
 
 finally:
-    print("connected")
     client.close()
     sftp.close()
 
