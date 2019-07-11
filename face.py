@@ -87,7 +87,7 @@ def saveFaceDetected( cap, cameraStatus, delayFace, waitLoop ):
             faceImage = cv2.resize( faceImage, ( 255, 255 ) )
             fileName = hashNameImage + "_" + str( counterFrames ) + ".png"
             cv2.imwrite( os.path.join( pathFolder, fileName ), faceImage )
-            jsonTimer.append({'datetime' : time.strftime("%Y-%m-%d %H:%M:%S"), 'minute' : minute, 'second': second })
+            jsonTimer.append({'image' : fileName , 'datetime' : time.strftime("%Y-%m-%d %H:%M:%S"), 'minute' : minute, 'second': second })
 
             print('------' + fileName + '------')
 

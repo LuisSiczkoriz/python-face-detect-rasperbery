@@ -1,4 +1,4 @@
-import os, shutil
+import os, shutil, time
 from datetime import datetime
 
 pathRoot = os.getcwd()
@@ -21,6 +21,10 @@ def checkFolderNone( dirpath ):
             os.system( 'rmdir "%s"' % os.path.join( dirpath, dirFile ) )
 
 
+def removeFolderFile( dirpath ):
+   shutil.rmtree( dirpath )
+
+
 def zipAll( source, destination ):
     generateFolderDefault()
 
@@ -32,6 +36,10 @@ def zipAll( source, destination ):
     print( source, destination, archive_from, archive_to )
     shutil.make_archive( name, format, archive_from, archive_to )
     shutil.move( '%s.%s'%( name,format ), destination )
+    time.sleep(2)
+    removeFolderFile( source )
+    print('Enviado pasta e removendo files')
+
 
 
 checkFolderNone( source )
