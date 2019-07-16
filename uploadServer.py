@@ -6,10 +6,10 @@ import time
 
 pathRoot = os.getcwd()
 source = os.path.join( pathRoot, 'upload' )
-dest = '/home/ubuntu/'
+dest = '/home/ubuntu/poc-face-detect-server/upload/'
 
 keyRSA = os.path.join( pathRoot, 'keyAws.pem' )
-hostname = "ec2-52-55-113-15.compute-1.amazonaws.com"
+hostname = "ec2-54-167-53-46.compute-1.amazonaws.com"
 port = '22'
 username = "ubuntu"
 
