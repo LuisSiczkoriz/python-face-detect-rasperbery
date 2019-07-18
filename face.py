@@ -14,8 +14,8 @@ pathOpencv = os.path.dirname(cv2.__file__)
 timerStop = int( 120 )
 
 #load file face
-faceCascade = cv2.CascadeClassifier( pathOpencv + '\\data\\haarcascade_frontalface_alt.xml' )
-eyeGlassCascade = cv2.CascadeClassifier(pathOpencv + '\\data\\haarcascade_eye_tree_eyeglasses.xml')
+faceCascade = cv2.CascadeClassifier( 'data/haarcascade_frontalface_alt.xml' )
+eyeGlassCascade = cv2.CascadeClassifier('data/haarcascade_eye_tree_eyeglasses.xml')
 
 def generateRandomHashName():
     hashValue = hashlib.sha1( str( datetime.now() ).encode('utf-8') ).hexdigest()
@@ -70,8 +70,9 @@ def saveFaceDetected( cap, cameraStatus, delayFace, waitLoop ):
         else:
             counterNotFace  = 0
             for ( x, y, w, h ) in faces:
+                continue
                 #funcao para adicionar cor no rosto e olhos
-                colorDraw( frame, gray, x, y, w, h )
+                #colorDraw( frame, gray, x, y, w, h )
 
             #funcao para adicionar cor no rosto e olhos
             showCam( cameraStatus, frame )
