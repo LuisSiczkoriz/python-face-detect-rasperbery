@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+#-*- coding: utf-8 -*-
 import numpy as np
 import cv2
 import os
@@ -8,7 +10,6 @@ from datetime import datetime
 
 #Path
 pathRoot = os.getcwd()
-pathOpencv = os.path.dirname(cv2.__file__)
 
 #max timer 2 minutes
 timerStop = int( 120 )
@@ -106,6 +107,7 @@ def saveFaceDetected( cap, cameraStatus, delayFace, waitLoop ):
            # print(pathFolder)
            # print(jsonTimer)
             print(saveFileJson( jsonTimer, pathFolder ))
+            cap.release()
             return True
 
     cap.release()
@@ -132,7 +134,6 @@ def colorDraw( frame, gray, x, y, w, h ):
     for (ex, ey, ew, eh) in eyes:
         cv2.rectangle( roiColor, (ex, ey), ( ex + ew, ey + eh ), colorEyes, stroke )
 
-
 def saveFileJson( objectJson, path ):
     pathFile = os.path.join( path, 'file.json' )
     fileWriteJson = open( pathFile, 'w')
@@ -146,7 +147,9 @@ def start():
     cameraStatus = False
 
     camera = cv2.VideoCapture(0)
-    
+    camera.release()
+    camera = cv2.VideoCapture(0)
+
     returnStatus = saveFaceDetected( camera, cameraStatus, delayFace, waitLoop )
 
     if( returnStatus == True ):
