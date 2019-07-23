@@ -3,14 +3,41 @@ from datetime import datetime
 
 pathRoot = os.getcwd()
 source = os.path.join( pathRoot, 'files' )
-destination = os.path.join( pathRoot, 'upload/files.zip' )
+filesTemp = os.path.join( pathRoot, 'filesTemp' )
+destination = os.path.join( pathRoot, 'upload' )
 
-def generateFolderDefault():
-    folderName = 'upload'
+def listFolderFiles( dirpath ):
+    if not os.path.exists( dirpath ):
+        print('Não existe a pasta files')
+        sys.exit()
 
+    countIndex = 0
+    destination = generateFolderDefault( 'filesTemp' )
+    upload = os.path.join( pathRoot, 'upload' )
+
+    dirFiles = os.listdir( dirpath )
+    totalDir = len( dirFiles ) - 2
+
+    if totalDir <= 0:
+        print('Quantidade de diretorio tem que ser maior que 2.')
+        removeFolderFile( destination )
+        removeFolderFile( upload )
+        sys.exit()
+
+    for dirFile in dirFiles:
+        dirNext = not os.listdir( os.path.join( dirpath, dirFile ) )
+
+        if countIndex > totalDir:
+            return True
+        else:
+            shutil.move( os.path.join( dirpath, dirFile ), destination )
+
+        countIndex += 1
+
+def generateFolderDefault( folderName ):
     if not os.path.exists( os.path.join( pathRoot, folderName ) ):
         os.makedirs( os.path.join( pathRoot, folderName ) )
-    
+
     return os.path.normpath( os.path.join( pathRoot, folderName ) )
 
 def checkFolderNone( dirpath ):
@@ -33,13 +60,11 @@ def checkFolderNone( dirpath ):
                     removeFolderFile( os.path.join( dirpath, dirFile ) )
                     break
 
-
-
 def removeFolderFile( dirpath ):
    shutil.rmtree( dirpath )
 
 def zipAll( source, destination ):
-    generateFolderDefault()
+    generateFolderDefault( 'upload' )
 
     base = os.path.basename( destination )
     name = base.split('.')[0]
@@ -48,12 +73,11 @@ def zipAll( source, destination ):
     archive_to = os.path.basename( source.strip( os.sep ) )
     print( source, destination, archive_from, archive_to )
     shutil.make_archive( name, format, archive_from, archive_to )
-    shutil.move( '%s.%s'%( name,format ), destination )
+    shutil.move( '%s.%s'%( name, format ), destination )
     time.sleep(2)
     removeFolderFile( source )
     print('Enviado pasta e removendo files')
 
-
-
-checkFolderNone( source )
-zipAll( source, destination )
+if listFolderFiles( source ) == True:
+    checkFolderNone( filesTemp )
+    zipAll( filesTemp, os.path.join( destination, 'files.zip' ) )

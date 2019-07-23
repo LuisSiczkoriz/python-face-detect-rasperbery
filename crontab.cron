@@ -1,3 +1,4 @@
-@reboot python3 face.py
-00 22 * * * python3 zipFiles.py
-00 23 * * * python3 uploadServer.py
+#* * * * * echo "teste cron" >/dev/null 2>&1
+@reboot /bin/sh /home/ubuntu/poc-face-detect-rasperbery/cronFace.sh > /dev/null 2>&1
+30 * * * * /bin/sh /home/ubuntu/poc-face-detect-rasperbery/cronZipFiles.sh > /dev/null 2>&1
+35 * * * * /bin/sh /home/ubuntu/poc-face-detect-rasperbery/cronUpload.sh > /dev/null 2>&1
